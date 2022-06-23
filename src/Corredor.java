@@ -1,6 +1,6 @@
 package src;
 
-public class Corredor {
+public class Corredor implements Comparable<Corredor> {
   private String nome;
   private int posicao;
   private float distanciaPercorrida;
@@ -12,10 +12,16 @@ public class Corredor {
     this.distanciaPercorrida = distanciaPercorrida;
   }
 
-  // @Override
-  // public int compareTo(Corredor corredor) {
-  // return this.distanciaPercorrida.compareTo(corredor.getDistanciaPercorrida());
-  // }
+  @Override
+  public int compareTo(Corredor corredor) {
+    if (this.getDistanciaPercorrida() < corredor.getDistanciaPercorrida()) {
+      return 1;
+    } else if (this.getDistanciaPercorrida() == corredor.getDistanciaPercorrida()) {
+      return 0;
+    } else {
+      return -1;
+    }
+  }
 
   public String getNome() {
     return nome;
@@ -35,7 +41,7 @@ public class Corredor {
 
   // contabiliza a "distancia" que o corredor correu
   public void correu(int nroVoltas) {
-    volta = (float) (0.8 + (float) (Math.random() * 1.2));
+    volta = (float) ((float) (Math.random() * 1));
     distanciaPercorrida += volta;
   }
 

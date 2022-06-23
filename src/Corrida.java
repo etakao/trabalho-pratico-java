@@ -3,6 +3,7 @@ package src;
 import screens.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Corrida {
@@ -12,9 +13,6 @@ public class Corrida {
   private int probAbast;
 
   private int voltaAtual;
-  private Corredor primeiroColocado;
-  private Corredor segundoColocado;
-  private Corredor terceiroColocado;
 
   private List<Corredor> corredores;
 
@@ -24,10 +22,6 @@ public class Corrida {
     this.probQuebra = probQuebra;
     this.probAbast = probAbast;
     this.voltaAtual = 1;
-
-    primeiroColocado = new Corredor("Corredor", 0);
-    segundoColocado = new Corredor("Corredor", 0);
-    terceiroColocado = new Corredor("Corredor", 0);
   }
 
   public void prepararCorredores() {
@@ -38,30 +32,22 @@ public class Corrida {
     }
   }
 
-  public void ordenarPodio(List<Corredor> corredores) {
-    for (Corredor corredor : corredores) {
-      if (corredor.getDistanciaPercorrida() > primeiroColocado.getDistanciaPercorrida()) {
-        terceiroColocado = segundoColocado;
-        segundoColocado = primeiroColocado;
-        primeiroColocado = corredor;
-      } else if (corredor.getDistanciaPercorrida() > segundoColocado.getDistanciaPercorrida()) {
-        terceiroColocado = segundoColocado;
-        segundoColocado = corredor;
-      } else if (corredor.getDistanciaPercorrida() > terceiroColocado.getDistanciaPercorrida()) {
-        terceiroColocado = corredor;
-      }
-    }
-  }
-
   public void mostrarPodioNaVolta(List<Corredor> corredores) {
-    ordenarPodio(corredores);
+    Collections.sort(corredores);
 
-    if (primeiroColocado.getDistanciaPercorrida() > voltaAtual) {
+    if (corredores.get(0).getDistanciaPercorrida() > voltaAtual) {
+
       voltaAtual++;
 
-      Frame.printStatus("1° Lugar: " + primeiroColocado.getNome());
-      Frame.printStatus("2° Lugar: " + segundoColocado.getNome());
-      Frame.printStatus("3° Lugar: " + terceiroColocado.getNome());
+      Frame.printStatus("1° Lugar: " + corredores.get(0).getNome());
+      Frame.printStatus("2° Lugar: " + corredores.get(1).getNome());
+      Frame.printStatus("3° Lugar: " + corredores.get(2).getNome());
+
+      if (voltaAtual <= nroVoltas) {
+        Frame.printStatus("___________________");
+        Frame.printStatus("VOLTA " + voltaAtual);
+        Frame.printStatus("-------------------");
+      }
     }
   }
 
@@ -75,11 +61,11 @@ public class Corrida {
     Frame.printStatus("-------------------");
     Frame.printStatus("");
 
-    while (voltaAtual < nroVoltas) {
-      Frame.printStatus("___________________");
-      Frame.printStatus("VOLTA " + voltaAtual);
-      Frame.printStatus("-------------------");
+    Frame.printStatus("___________________");
+    Frame.printStatus("VOLTA " + voltaAtual);
+    Frame.printStatus("-------------------");
 
+    while (voltaAtual <= nroVoltas) {
       for (Corredor corredor : corredores) {
         if (corredor.abasteceu(probAbast, nroVoltas)) {
           Frame.printStatus("! O " + corredor.getNome() +
@@ -100,15 +86,15 @@ public class Corrida {
     if (voltaAtual < nroVoltas) {
       Frame.printStatus("A corrida ainda não terminou!");
     } else {
-      ordenarPodio(corredores);
+      Collections.sort(corredores);
 
       Frame.printStatus("________________________________");
       Frame.printStatus("Fim da corrida! Confira o pódio: ");
       Frame.printStatus("--------------------------------");
 
-      Frame.printStatus("1° Lugar: " + primeiroColocado.getNome());
-      Frame.printStatus("2° Lugar: " + segundoColocado.getNome());
-      Frame.printStatus("3° Lugar: " + terceiroColocado.getNome());
+      Frame.printStatus("1° Lugar: " + corredores.get(0).getNome());
+      Frame.printStatus("2° Lugar: " + corredores.get(1).getNome());
+      Frame.printStatus("3° Lugar: " + corredores.get(2).getNome());
     }
   }
 }
