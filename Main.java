@@ -1,4 +1,4 @@
-import javax.swing.JFrame;
+import javax.swing.*;
 
 import screens.*;
 
@@ -7,7 +7,7 @@ public class Main {
     Frame frame = new Frame();
 
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(740, 600);
+    frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
     frame.setVisible(true);
   }
 }

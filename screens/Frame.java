@@ -1,10 +1,8 @@
 package screens;
 
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.*;
 
 import src.Corrida;
@@ -12,57 +10,94 @@ import src.Corrida;
 public class Frame extends JFrame {
   private int carsAmount, lapsAmount, crashProb, fuelProb;
 
-  private JButton button;
+  private JButton startRaceButton;
   private JScrollPane scroll;
   private JTextField cars, laps, crashProbability, fuelProbability;
 
-  private static JTextArea showStatus;
+  private static JTextArea statusTextArea;
 
-  private JPanel inputsArea;
-  private JPanel showArea;
+  public static JPanel inputsPanel, raceStatusPanel, raceProgressPanel, raceTextStatusPanel;
+
+  public static Frame frame = new Frame();
+  private GridBagConstraints gbc = new GridBagConstraints();
+  public static GridBagConstraints gbc2 = new GridBagConstraints();
 
   public Frame() {
-    setLayout(new GridLayout(1, 2));
+    setLayout(new GridBagLayout());
 
-    inputsArea = new JPanel();
-    inputsArea.setLayout(new FlowLayout(FlowLayout.CENTER));
-    showArea = new JPanel();
-    showArea.setLayout(new FlowLayout(FlowLayout.CENTER));
+    inputsPanel = new JPanel();
+    inputsPanel.setLayout(new GridBagLayout());
+    inputsPanel.setSize(500, 200);
 
-    cars = new JTextField(10);
-    laps = new JTextField(10);
-    crashProbability = new JTextField(10);
-    fuelProbability = new JTextField(10);
+    raceStatusPanel = new JPanel();
+    raceStatusPanel.setLayout(new GridLayout(1, 2));
+    raceStatusPanel.setPreferredSize(new Dimension(800, 500));
 
-    button = new JButton("Começar corrida");
+    raceProgressPanel = new JPanel();
+    raceProgressPanel.setPreferredSize(new Dimension(350, 500));
+    raceProgressPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
-    showStatus = new JTextArea(30, 30);
-    showStatus.setEditable(false);
-    showStatus.setLineWrap(true);
+    raceTextStatusPanel = new JPanel();
+    raceTextStatusPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
-    scroll = new JScrollPane(showStatus);
+    cars = new JTextField(8);
+    laps = new JTextField(8);
+    crashProbability = new JTextField(8);
+    fuelProbability = new JTextField(8);
+
+    startRaceButton = new JButton("Iniciar corrida");
+
+    statusTextArea = new JTextArea(30, 30);
+    statusTextArea.setEditable(false);
+    statusTextArea.setLineWrap(true);
+    scroll = new JScrollPane(statusTextArea);
     scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-    inputsArea.add(new JLabel("Quantidade de carros: "));
-    inputsArea.add(cars);
+    // gbc.insets = new Insets(5,5,5,5);
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    inputsPanel.add(new JLabel("Quantidade de carros: "), gbc);
+    gbc.gridx = 0;
+    gbc.gridy = 1;
+    inputsPanel.add(cars, gbc);
+    gbc.gridx = 1;
+    gbc.gridy = 0;
+    inputsPanel.add(new JLabel("Quantidade de voltas: "), gbc);
+    gbc.gridx = 1;
+    gbc.gridy = 1;
+    inputsPanel.add(laps, gbc);
+    gbc.gridx = 2;
+    gbc.gridy = 0;
+    inputsPanel.add(new JLabel("Probabilidade de quebra: "), gbc);
+    gbc.gridx = 2;
+    gbc.gridy = 1;
+    inputsPanel.add(crashProbability, gbc);
+    gbc.gridx = 3;
+    gbc.gridy = 0;
+    inputsPanel.add(new JLabel("Probabilidade de abastecimento: "), gbc);
+    gbc.gridx = 3;
+    gbc.gridy = 1;
+    inputsPanel.add(fuelProbability, gbc);
+    gbc.gridx = 2;
+    gbc.gridy = 2;
+    gbc.gridwidth = 3;
 
-    inputsArea.add(new JLabel("Quantidade de voltas: "));
-    inputsArea.add(laps);
+    inputsPanel.add(startRaceButton, gbc);
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    add(inputsPanel, gbc);
+    /* fim do painel dos inputs */
 
-    inputsArea.add(new JLabel("Probabilidade de quebra: "));
-    inputsArea.add(crashProbability);
+    raceTextStatusPanel.add(scroll);
 
-    inputsArea.add(new JLabel("Probabilidade de abastecimento: "));
-    inputsArea.add(fuelProbability);
+    raceStatusPanel.add(raceProgressPanel);
+    raceStatusPanel.add(raceTextStatusPanel);
 
-    inputsArea.add(button);
+    gbc.gridx = 0;
+    gbc.gridy = 1;
+    add(raceStatusPanel, gbc);
 
-    showArea.add(scroll);
-
-    add(inputsArea);
-    add(showArea);
-
-    button.addActionListener(new ActionListener() {
+    startRaceButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         lapsAmount = Integer.parseInt(laps.getText().trim());
         carsAmount = Integer.parseInt(cars.getText().trim());
@@ -70,14 +105,12 @@ public class Frame extends JFrame {
         crashProb = Integer.parseInt(crashProbability.getText().trim());
 
         Corrida corrida = new Corrida(carsAmount, lapsAmount, crashProb, fuelProb);
-        corrida.prepararCorredores();
-        corrida.iniciarCorrida();
-        corrida.exibirPodio();
+        corrida.start();
       }
     });
   }
 
   public static void printStatus(String args) {
-    showStatus.append(args + "\n");
+    statusTextArea.append(args + "\n");
   }
 }

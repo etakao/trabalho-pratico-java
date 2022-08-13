@@ -1,15 +1,35 @@
 package src;
 
-public class Corredor implements Comparable<Corredor> {
+import javax.swing.JProgressBar;
+
+import screens.*;
+
+public class Corredor extends Thread implements Comparable<Corredor> {
   private String nome;
   private int posicao;
-  private float distanciaPercorrida;
+  private double distanciaPercorrida;
 
-  private float volta;
+  private int nroVoltas;
+  private int probQuebra;
+  private int probAbast;
 
-  public Corredor(String nome, float distanciaPercorrida) {
+  private double volta;
+
+  private JProgressBar carProgress;
+
+  public Corredor(String nome, int nroVoltas, int probQuebra, int probAbast) {
     this.nome = nome;
-    this.distanciaPercorrida = distanciaPercorrida;
+    this.nroVoltas = nroVoltas;
+    this.probQuebra = probQuebra;
+    this.probAbast = probAbast;
+
+    carProgress = new JProgressBar(0, 100);
+    carProgress.setStringPainted(true);
+    carProgress.setString(nome);
+    
+    Frame.raceProgressPanel.add(carProgress);
+    Frame.raceProgressPanel.revalidate();
+    distanciaPercorrida = 0;
   }
 
   @Override
@@ -35,38 +55,76 @@ public class Corredor implements Comparable<Corredor> {
     this.posicao = posicao;
   }
 
-  public float getDistanciaPercorrida() {
+  public double getDistanciaPercorrida() {
     return distanciaPercorrida;
   }
 
   // contabiliza a "distancia" que o corredor correu
-  public void correu(int nroVoltas) {
-    volta = (float) ((float) (Math.random() * 1));
+  public void correu() {
+    volta = (double) ((double) (Math.random() * 1));
     distanciaPercorrida += volta;
+
+    carProgress.setValue((int) Math.round((100 * distanciaPercorrida) / nroVoltas));
   }
 
   // aplica a probabilidade de quebra do carro
-  public boolean quebrou(int probQuebra) {
+  public boolean quebrou() {
     int prob = (int) (Math.random() * 100);
 
-    if (prob <= probQuebra) {
+    if (prob < probQuebra) {
+      Frame.printStatus("!! O carro do " + nome + " quebrou e foi ao pitstop !!");
       return true;
     } else
       return false;
   }
 
   // aplica a probabilidade de abastecimento do carro
-  public boolean abasteceu(int probAbast, int nroVoltas) {
+  public boolean abasteceu() {
     // aplica a probabilidade de abastecimento somente apos metade das voltas
-    if (distanciaPercorrida > nroVoltas / 2) {
+    if (distanciaPercorrida > (nroVoltas / 2)) {
       int prob = (int) (Math.random() * 100);
 
-      if (prob <= probAbast) {
+      if (prob < probAbast) {
+        Frame.printStatus("! O " + nome + " parou para abastecer !");
         return true;
       } else
         return false;
     }
 
     return false;
+  }
+
+  // método run da thread
+  @Override
+  public void run() {
+    while (distanciaPercorrida < nroVoltas) {
+      if (abasteceu()) {
+        try {
+          sleep(200);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+      if (quebrou()) {
+        try {
+          sleep(400);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+
+      correu();
+
+      // tempo de espera para verificar a volta atual
+      try {
+        sleep(500);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+
+    if (Corrida.podio.size() < 3) {
+      Corrida.podio.add(this);
+    }
   }
 }
